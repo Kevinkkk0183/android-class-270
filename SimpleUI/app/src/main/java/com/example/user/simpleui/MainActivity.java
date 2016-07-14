@@ -1,7 +1,9 @@
 package com.example.user.simpleui;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         });
         setUpListView();
         setupSpinner();
+        Log.d("Debug","Main Activity OnCreate");
     }
 
 
@@ -96,6 +99,50 @@ public class MainActivity extends AppCompatActivity {
 
         textView.setText(text);
         editText.setText("");
+    }
+
+    public  void  goToMenu(View view)
+    {
+        Intent intent = new Intent();
+        intent.setClass(this,DrinkMenuActivity.class);
+        startActivity(intent);
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("Debug", "Main Activity OnStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("Debug","Main Activity OnResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("Debug","Main Activity OnPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("Debug","Main Activity OnStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("Debug","Main Activity OnDestroy");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("Debug","Main Activity OnRestart");
     }
 }
 
