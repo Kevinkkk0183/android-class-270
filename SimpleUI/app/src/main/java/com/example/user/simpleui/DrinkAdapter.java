@@ -55,6 +55,7 @@ public class DrinkAdapter extends BaseAdapter {
             holder.imageView = (ImageView)convertView.findViewById(R.id.imageView);
             holder.mPricetextView =(TextView)convertView.findViewById(R.id.mPriceTextView);
             holder.lPriceTextView=(TextView)convertView.findViewById(R.id.lPriceTextView);
+            convertView.setTag(holder);
         }
         else{
             holder =(Holder)convertView.getTag();
