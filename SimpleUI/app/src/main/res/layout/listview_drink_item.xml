@@ -52,8 +52,8 @@
         android:layout_height="wrap_content"
         android:text="45"
         android:id="@+id/lPriceTextView"
-        android:layout_below="@+id/textView5"
+        android:layout_below="@+id/drinkNameTextView"
         android:layout_alignLeft="@+id/textView5"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="15dp" />
 
 </RelativeLayout>
