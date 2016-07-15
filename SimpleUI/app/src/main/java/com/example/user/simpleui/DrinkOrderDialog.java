@@ -46,11 +46,11 @@ public class DrinkOrderDialog extends DialogFragment {
      * @return A new instance of fragment DrinkOrderDialog.
      */
     // TODO: Rename and change types and number of parameters
-    public static DrinkOrderDialog newInstance(String param1, String param2) {
+    public static DrinkOrderDialog newInstance(DrinkOrder drinkOrder) {
         DrinkOrderDialog fragment = new DrinkOrderDialog();
         Bundle args = new Bundle(); //Bundle是fragment間幫忙帶資料的
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, drinkOrder.toData());
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,6 +78,14 @@ public class DrinkOrderDialog extends DialogFragment {
        if (getArguments() != null)
        {
            Bundle bundle = getArguments();
+           String data = bundle.getString(ARG_PARAM1);
+           DrinkOrder drinkOrder = DrinkOrder.newInstanceWithData(data);
+           if (drinkOrder == null)
+           {
+               throw new RuntimeException("Instance Drink Order Fail");
+           }
+
+
        }
         AlertDialog.Builder alterDialogBuilder = new AlertDialog.Builder(getActivity());
 
@@ -130,6 +138,6 @@ public class DrinkOrderDialog extends DialogFragment {
      */
     public interface OnDrinkOrderListener {
         // TODO: Update argument type and name
-        void onDrinkOrderFinished();
+        void onDrinkOrderFinished(DrinkOrder drinkOrder);
     }
 }

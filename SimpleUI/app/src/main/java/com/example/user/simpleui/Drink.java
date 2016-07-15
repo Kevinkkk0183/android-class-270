@@ -1,5 +1,7 @@
 package com.example.user.simpleui;
 
+import android.os.Bundle;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,8 +14,7 @@ public class Drink {
     int lPrice = 0;
     int imageId;
 
-    public JSONObject getJsonObject()
-    {
+    public JSONObject getJsonObject() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("name", name);
@@ -25,4 +26,20 @@ public class Drink {
 
     }
 
+    public static Drink newInstanceWithData(String data) {
+        Drink drink = new Drink();
+        try {
+            JSONObject jsonObject = new JSONObject(data);
+            drink.name = jsonObject.getString("name");
+            drink.lPrice = jsonObject.getInt("lPrice");
+            drink.mPrice = jsonObject.getInt("mPrice");
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+
+        }
+
+        return drink;
+    }
 }
