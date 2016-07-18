@@ -11,6 +11,10 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 
 /**
@@ -27,9 +31,14 @@ public class DrinkOrderDialog extends DialogFragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    NumberPicker mediumNumberPicker;
+    NumberPicker largeNumberPicker;
+    RadioGroup sugarRadioGroup;
+    RadioGroup iceRadioGroup;
+    EditText noteEditText;
+
+
+    private  DrinkOrder drinkOrder;
 
     private OnDrinkOrderListener mListener;
 
@@ -41,8 +50,8 @@ public class DrinkOrderDialog extends DialogFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+    // * @param param1 Parameter 1.
+     //* @param param2 Parameter 2.
      * @return A new instance of fragment DrinkOrderDialog.
      */
     // TODO: Rename and change types and number of parameters
@@ -79,7 +88,7 @@ public class DrinkOrderDialog extends DialogFragment {
        {
            Bundle bundle = getArguments();
            String data = bundle.getString(ARG_PARAM1);
-           DrinkOrder drinkOrder = DrinkOrder.newInstanceWithData(data);
+           drinkOrder = DrinkOrder.newInstanceWithData(data);
            if (drinkOrder == null)
            {
                throw new RuntimeException("Instance Drink Order Fail");
@@ -92,10 +101,20 @@ public class DrinkOrderDialog extends DialogFragment {
         View contentView = getActivity().getLayoutInflater().inflate(R.layout.fragment_drink_order_dialog, null);
 
         alterDialogBuilder.setView(contentView)
-                .setTitle("Hello Dialog")
+                .setTitle(drinkOrder.drink.name)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        drinkOrder.mNumber = mediumNumberPicker.getValue();
+                        drinkOrder.lNumber = largeNumberPicker.getValue();
+                        drinkOrder.note = noteEditText.getText().toString();
+                        drinkOrder.ice = getSelectedTextFromRadioGroup(iceRadioGroup);
+                        drinkOrder.sugar = getSelectedTextFromRadioGroup(sugarRadioGroup);
+
+                        if (mListener != null)
+                        {
+                            mListener.onDrinkOrderFinished(drinkOrder);
+                        }
 
                     }
                 })
@@ -106,8 +125,31 @@ public class DrinkOrderDialog extends DialogFragment {
                     }
                 });
 
+        mediumNumberPicker = (NumberPicker)contentView.findViewById(R.id.mediumNumberPicker);
+        mediumNumberPicker.setMaxValue(100); // 設定杯數上限
+        mediumNumberPicker.setMinValue(0); // 設定杯數下限
+        mediumNumberPicker.setValue(drinkOrder.mNumber); //預設杯數值
+
+        largeNumberPicker = (NumberPicker)contentView.findViewById(R.id.largeNumberPicker);
+        largeNumberPicker.setMaxValue(100);
+        largeNumberPicker.setMinValue(0);
+        largeNumberPicker.setValue(drinkOrder.lNumber);
+
+        iceRadioGroup = (RadioGroup)contentView.findViewById(R.id.iceRadioGroup);
+        sugarRadioGroup = (RadioGroup)contentView.findViewById(R.id.sugarRadioGroup);
+        noteEditText = (EditText)contentView.findViewById(R.id.noteEditText);
+
+
         return alterDialogBuilder.create();
     }
+
+    private  String getSelectedTextFromRadioGroup(RadioGroup radioGroup)
+    {
+        int checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+        RadioButton checkedRadioButton = (RadioButton)radioGroup.findViewById(checkedRadioButtonId);
+        return checkedRadioButton.getText().toString();
+    } //實作一個function，讓我們能從RadioGroup取出RadioButton上的選取內容(EX:少冰、無糖)
+
 
     @Override
     public void onAttach(Context context) {
