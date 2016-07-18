@@ -49,19 +49,18 @@ public class MainActivity extends AppCompatActivity {
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
         listView = (ListView) findViewById(R.id.listView);
         spinner = (Spinner) findViewById(R.id.spinner);
-        sharedPreferences = getSharedPreferences("setting",MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("setting", MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        editText.setText(sharedPreferences.getString("editText",""));
+        editText.setText(sharedPreferences.getString("editText", ""));
 
 
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 String text = editText.getText().toString();
-                editor.putString("editText",text);
+                editor.putString("editText", text);
                 editor.commit(); //要做commit才能寫進
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)
-                {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     submit(v);
                     return true;
                 }
@@ -77,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+
+        String history = Utils.readFile(this,"history");
+        String[] datas = history.split("\n");
+        for (String data : datas)
+        {
+            Order order = Order.newInstanceWithData(data);
+            if (order !=null)
+                orders.add(order);
+        }
+
         setUpListView();
         setupSpinner();
         Log.d("Debug","Main Activity OnCreate");
@@ -111,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
         order.storeInfo = (String)spinner.getSelectedItem();
 
         orders.add(order);
+        Utils.writeFile(this, "history", order.toData() + "\n");
+
         setUpListView();
 
         textView.setText(text);
@@ -133,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode ==RESULT_OK)
             {
                 Toast.makeText(this,"完成菜單",Toast.LENGTH_SHORT).show();
+                textView.setText(data.getStringExtra("results"));
                 menuResults = (data.getStringExtra("results"));
             }
         }

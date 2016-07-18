@@ -176,12 +176,12 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
     @Override
     public void onDrinkOrderFinished(DrinkOrder drinkOrder) {
         Boolean flag = false;
-        for (int index =0; index<orders.size(); index++)
+        for (int index = 0; index<orders.size(); index++)
         {
             if(orders.get(index).drink.name.equals(drinkOrder.drink.name))
             {
                 orders.set(index,drinkOrder);
-                flag =true;
+                flag = true;
                 break;
             }
         }

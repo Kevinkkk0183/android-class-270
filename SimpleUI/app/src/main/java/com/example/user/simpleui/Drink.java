@@ -18,7 +18,8 @@ public class Drink {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("name", name);
-            jsonObject.put("price", mPrice);
+            jsonObject.put("mPrice", mPrice);
+            jsonObject.put("lPrice", lPrice);
         } catch (JSONException e) {
             e.printStackTrace();
         }
