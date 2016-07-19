@@ -84,18 +84,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        String history = Utils.readFile(this,"history");
+        /*String history = Utils.readFile(this,"history");
         String[] datas = history.split("\n");
         for (String data : datas)
         {
             Order order = Order.newInstanceWithData(data);
             if (order !=null)
                 orders.add(order);
-        }
+        }*/
 
         setUpListView();
         setupSpinner();
-        ParseObject parseObject = new ParseObject("Test");
+       /* ParseObject parseObject = new ParseObject("Test");
         parseObject.put("foo","bar");
         parseObject.saveInBackground(new SaveCallback() {
             @Override
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        });
+        }); */
 
 
         Log.d("Debug","Main Activity OnCreate");
@@ -140,8 +140,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void setUpListView()
     {
-        OrderAdapter adapter =new OrderAdapter(this,orders);
-        listView.setAdapter(adapter);
+        Order.getOrderFromRemote(new FindCallback<Order>() {
+            @Override
+            public void done(List<Order> objects, ParseException e) {
+                orders = objects;
+                OrderAdapter adapter = new OrderAdapter(MainActivity.this, orders);
+                listView.setAdapter(adapter);
+            }
+        });
+
     }
 
 
@@ -149,9 +156,10 @@ public class MainActivity extends AppCompatActivity {
         String text = editText.getText().toString();
 
         Order order = new Order();
-        order.note = text;
-        order.menuResults = menuResults;
-        order.storeInfo = (String)spinner.getSelectedItem();
+        order.setNote(text) ;
+        order.setMenuResults(menuResults);
+        order.setStoreInfo((String) spinner.getSelectedItem());
+        order.saveInBackground();
 
         orders.add(order);
         Utils.writeFile(this, "history", order.toData() + "\n");
