@@ -16,6 +16,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +93,17 @@ public class MainActivity extends AppCompatActivity {
 
         setUpListView();
         setupSpinner();
+        ParseObject parseObject = new ParseObject("Test");
+        parseObject.put("foo","bar");
+        parseObject.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null)
+                    Toast.makeText(MainActivity.this,"上傳成功", Toast.LENGTH_LONG).show();
+            }
+        });
+
+
         Log.d("Debug","Main Activity OnCreate");
     }
 
