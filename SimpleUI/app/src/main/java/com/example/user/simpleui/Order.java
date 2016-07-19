@@ -120,12 +120,13 @@ public class Order extends ParseObject {
                if (e == null)
                {
                    Order.pinAllInBackground("Order", objects);
+                   callback.done(objects,e);
                }
                else
                {
                    Order.getQuery().fromLocalDatastore().findInBackground(callback);
                }
-               callback.done(objects,e); //?????
+
            }
        });
     }

@@ -190,12 +190,17 @@ public class MainActivity extends AppCompatActivity {
         order.setStoreInfo((String) spinner.getSelectedItem());
 
         order.pinInBackground("Order"); //將資料存在local端
-        order.saveEventually();
+        order.saveEventually(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                setUpListView();
+            }
+        });
 
         orders.add(order);
         Utils.writeFile(this, "history", order.toData() + "\n");
 
-        setUpListView();
+
 
         textView.setText(text);
         editText.setText("");
