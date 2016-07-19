@@ -13,9 +13,9 @@ public class SimpleUIApplication extends Application {
         super.onCreate();
 
         Parse.initialize(new Parse.Configuration.Builder(this)
-                        .applicationId("76ee57f8e5f8bd628cc9586e93d428d5")
-                        .server("http://parseserver-ps662-env.us-east-1.elasticbeanstalk.com/parse/")
-                        //.clientKey("")
+                        .applicationId("xDTUNne92ZNeldPcTrUPMT9RUowQwC7KxR7aLGx7")
+                        .server("https://parseapi.back4app.com/")
+                        .clientKey("FGYIC6Z7VTMLFMyWo1RUoMNNT7WUePa5ngxXCLSr")
                         .build()
 
         );
