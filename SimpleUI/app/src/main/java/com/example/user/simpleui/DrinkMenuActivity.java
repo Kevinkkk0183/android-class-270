@@ -12,6 +12,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,7 +48,7 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
 
     private  void  setData()
     {
-        for (int i=0; i<names.length;i++)
+        /*for (int i=0; i<names.length;i++)
         {
             Drink drink = new Drink();
             drink.setName(names[i]);
@@ -53,8 +56,16 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
             drink.setlPrice(lPrices[i]);
             drink.imageId =imageId[i];
             drinks.add(drink);
-        }
+        }*/
+        Drink.syncDrinkFromRemote(new FindCallback<Drink>() {
+            @Override
+            public void done(List<Drink> objects, ParseException e) {
+                drinks = objects;
+                setupDrinkMenuListView();
+            }
+        });
     }
+
 
     private void  setupDrinkMenuListView()
     {
