@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -95,7 +96,13 @@ public class MainActivity extends AppCompatActivity {
             if (order !=null)
                 orders.add(order);
         }*/
-
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Order order = (Order)parent.getAdapter().getItem(position);
+                goToDetail(order);
+            }
+        });
         setUpListView();
         setupSpinner();
        /* ParseObject parseObject = new ParseObject("Test");
@@ -209,10 +216,22 @@ public class MainActivity extends AppCompatActivity {
     public  void  goToMenu(View view)
     {
         Intent intent = new Intent();
-        intent.setClass(this,DrinkMenuActivity.class);
+        intent.setClass(this, DrinkMenuActivity.class);
         startActivityForResult(intent, REQUEST_CODE_DRINK_MENU_ACTIVITY);
 
     }
+
+    public void goToDetail(Order order)
+    {
+        Intent intent = new Intent();
+        intent.setClass(this, OrderDetailActivity.class);
+        intent.putExtra("note", order.getNote());
+        intent.putExtra("storeInfo",order.getStoreInfo());
+        intent.putExtra("menuResults", order.getMenuResults());
+        startActivity(intent);
+    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
