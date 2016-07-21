@@ -35,7 +35,7 @@ public class GeoCodingTask extends AsyncTask<String,Void,LatLng> {
         this.geoCodingResponseWeakReference = new WeakReference<GeoCodingResponse>(geoCodingResponse);
     }
     interface GeoCodingResponse{
-        void responseWithGeoCodingResults(LatLng latLng);
+        void responseWithGeoCodingResults(LatLng latlng);
     }
 
 }
