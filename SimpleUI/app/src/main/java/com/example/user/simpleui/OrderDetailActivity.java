@@ -4,6 +4,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.graphics.Color;
+import android.graphics.Point;
+
+import com.directions.route.AbstractRouting;
+import com.directions.route.Route;
+import com.directions.route.RouteException;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
 import com.google.android.gms.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -25,20 +33,25 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.Polyline;
+
 import android.Manifest;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.logging.Handler;
 
-public class OrderDetailActivity extends AppCompatActivity implements GeoCodingTask.GeoCodingResponse, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
-{
+public class OrderDetailActivity extends AppCompatActivity implements GeoCodingTask.GeoCodingResponse, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, RoutingListener {
 
     final static int  ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
     GoogleMap googleMap;
     GoogleApiClient googleApiClient;
     LocationRequest locationRequest;
     Marker marker;
+    LatLng storeLocation;
+    List<Polyline> polylines = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +115,7 @@ public class OrderDetailActivity extends AppCompatActivity implements GeoCodingT
                 }
             });
             //googleMap.moveCamera(cameraUpdate);
-
+            storeLocation =latlng;
             createGoogleAPIClient();
         }
 
@@ -141,7 +154,20 @@ public class OrderDetailActivity extends AppCompatActivity implements GeoCodingT
         {
             start = new LatLng(location.getLatitude(),location.getLongitude());
         }
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start,17));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 17));
+
+        Routing routing = new Routing.Builder()
+                .travelMode(AbstractRouting.TravelMode.WALKING)
+                .waypoints(start,storeLocation)
+                .withListener(this)
+                .build();
+        routing.execute();
+
+
+
+
+
+
     }
 
 
@@ -164,14 +190,12 @@ public class OrderDetailActivity extends AppCompatActivity implements GeoCodingT
     @Override
     public void onConnectionSuspended(int i)
     {
-
     }
 
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
-
     }
 
 
@@ -190,7 +214,9 @@ public class OrderDetailActivity extends AppCompatActivity implements GeoCodingT
     public void onLocationChanged(Location location)
     {
         LatLng currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,17));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17));
+
+
 
         if (marker == null)
         {
@@ -202,7 +228,109 @@ public class OrderDetailActivity extends AppCompatActivity implements GeoCodingT
             marker.setPosition(currentLatLng);
         }
 
+        /*if (polylines.size()>0)
+        {
+            for (Polyline polyline: polylines)
+            {
+                List<LatLng> points = polyline.getPoints();
+                for (int i=0; i<points.size();i++)
+                {
+                    if (i != points.size() -1)
+                    {
+                        LatLng point1 = points.get(i);
+                        LatLng point2 = points.get(i+1);
+
+                        Double maxLat = Math.max(point1.latitude, point2.latitude);
+                        Double minLat = Math.min(point1.latitude, point2.latitude);
+                        Double maxLng = Math.max(point1.longitude, point2.longitude);
+                        Double minLng = Math.min(point1.longitude, point2.longitude);
+                        if (currentLatLng.latitude>=minLat && currentLatLng.latitude<=maxLat && currentLatLng.longitude>=minLng && currentLatLng.longitude<=maxLng )
+                        {
+                            index = 1;
+                            break;
+                        }
+                    }
+                }
+                if (index != -1)
+                {
+                    for (int i =index-1; i>=0; i--)
+                    {
+                        points.remove(0);
+                    }
+                    points.set(0, currentLatLng);
+                    polyline.setPoints(points);
+                }
+            }
+        }*/
+
     }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+            if(googleApiClient != null)
+            {
+                googleApiClient.connect();
+            }
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+            if(googleApiClient != null)
+            {
+                googleApiClient.disconnect();
+            }
+    }
+
+    @Override
+    public void onRoutingFailure(RouteException e) {
+
+    }
+
+    @Override
+    public void onRoutingStart() {
+
+    }
+
+    @Override
+    public void onRoutingSuccess(ArrayList<Route> routes, int i) {
+        if (polylines.size()>0)
+        {
+            for (Polyline polyline : polylines)
+            {
+                polyline.remove();
+            }
+            polylines.clear();
+        }
+
+        for (int index = 0; index<routes.size(); index++)
+        {
+            List<LatLng> points = routes.get(index).getPoints();
+
+            PolylineOptions polylineOptions =  new PolylineOptions();
+            polylineOptions.addAll(points);
+            polylineOptions.color(Color.GREEN);
+            polylineOptions.width(10);
+
+            Polyline polyline = googleMap.addPolyline(polylineOptions);
+            polylines.add(polyline);
+        }
+    }
+
+    @Override
+    public void onRoutingCancelled() {
+
+    }
+
+
+
+
+
+
+
 
 
 
