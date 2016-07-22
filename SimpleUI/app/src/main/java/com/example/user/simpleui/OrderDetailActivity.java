@@ -31,12 +31,14 @@ import java.util.List;
 
 import java.util.logging.Handler;
 
-public class OrderDetailActivity extends AppCompatActivity implements GeoCodingTask.GeoCodingResponse, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class OrderDetailActivity extends AppCompatActivity implements GeoCodingTask.GeoCodingResponse, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener
+{
 
     final static int  ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
     GoogleMap googleMap;
     GoogleApiClient googleApiClient;
     LocationRequest locationRequest;
+    Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +191,19 @@ public class OrderDetailActivity extends AppCompatActivity implements GeoCodingT
     {
         LatLng currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,17));
+
+        if (marker == null)
+        {
+            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("台灣大學").snippet("Hello Google Map");
+            marker = googleMap.addMarker(markerOptions);
+        }
+        else
+        {
+            marker.setPosition(currentLatLng);
+        }
+
     }
+
 
 
 
