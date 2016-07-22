@@ -1,13 +1,22 @@
 package com.example.user.simpleui;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import com.google.android.gms.location.LocationListener;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,14 +25,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
+import android.Manifest;
 import java.lang.ref.WeakReference;
 import java.util.List;
+
 import java.util.logging.Handler;
 
-public class OrderDetailActivity extends AppCompatActivity implements GeoCodingTask.GeoCodingResponse {
+public class OrderDetailActivity extends AppCompatActivity implements GeoCodingTask.GeoCodingResponse, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    final static int  ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
     GoogleMap googleMap;
+    GoogleApiClient googleApiClient;
+    LocationRequest locationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,9 +100,99 @@ public class OrderDetailActivity extends AppCompatActivity implements GeoCodingT
                 }
             });
             //googleMap.moveCamera(cameraUpdate);
+
+            createGoogleAPIClient();
         }
 
     }
+    private  void  createGoogleAPIClient()
+    {
+        if (googleApiClient == null)
+        {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                            .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            googleApiClient.connect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+        PackageManager.PERMISSION_GRANTED)
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},ACCESS_FINE_LOCATION_REQUEST_CODE);
+            }
+            return;
+        }
+
+        createLocationRequest();
+
+        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        LatLng start = new LatLng(25.0186348, 121.5398379);
+        if (location != null)
+        {
+            start = new LatLng(location.getLatitude(),location.getLongitude());
+        }
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start,17));
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (ACCESS_FINE_LOCATION_REQUEST_CODE == requestCode)
+        {
+            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                onConnected(null);
+            }
+        }
+    }
+
+
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+
+    }
+
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult)
+    {
+
+    }
+
+
+    private void createLocationRequest()
+    {
+        if (locationRequest == null)
+        {
+            locationRequest = new LocationRequest();
+            locationRequest.setInterval(1000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        LatLng currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,17));
+    }
+
+
+
     /*public static class GeoCodingTask extends AsyncTask<String,Void,Bitmap>
     {
         WeakReference<ImageView> imageViewWeakReference;
